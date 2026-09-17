@@ -4,18 +4,32 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../cubit/prodectcubit_cubit.dart';
 
-class prodect extends StatelessWidget {
+class prodect extends StatefulWidget {
   const prodect({super.key});
+
+  @override
+  State<prodect> createState() => _prodectState();
+}
+
+class _prodectState extends State<prodect> {
+  void initState() {
+
+
+
+      context
+          .read<ProdectcubitCubit>()
+          .getallprodect11();
+
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey,
       appBar: AppBar(title:Text( 'My prodect '),backgroundColor: Colors.lightGreenAccent,),
-      body: BlocBuilder<ProdectcubitCubit,ProdectcubitState>(
-        builder: (context, state) {
+      body: BlocConsumer<ProdectcubitCubit,ProdectcubitState>(builder: (context, state) {
           if (state is ProdectcubitLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator(color: Colors.lightGreenAccent,));
           } else if (state is ProdectcubitSucses) {
             final products = state.data;
 
@@ -41,7 +55,21 @@ class prodect extends StatelessWidget {
             return Center(child: Text('حدث خطأ: ${state.error}'));
           }
           return const Center(child: Text('لا توجد منتجات'));
-        },
+        }, listener: ( context,  state) {
+
+        if (state is ProdectcubitLoading){
+              ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("جاري التحميل..."),
+              backgroundColor: Colors.blue,
+            ),
+          );
+
+        }
+        else if(state is ProdectcubitSucses){
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("تم تحميل المنتجات"),backgroundColor: Colors.lightGreenAccent,));
+        }
+      },
       ),
     );
   }
